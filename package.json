@@ -1,0 +1,27 @@
+{
+  "name": "socha-client",
+  "version": "0.0.1",
+  "description": "client",
+  "main": "main.js",
+  "type": "module",
+  "dependencies": {
+    "linq": "^4.0.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "node main.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/niklasCarstensen/socha-client-js.git"
+  },
+  "keywords": [
+    "socha"
+  ],
+  "author": "dobiko",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/niklasCarstensen/socha-client-js/issues"
+  },
+  "homepage": "https://github.com/niklasCarstensen/socha-client-js#readme"
+}
