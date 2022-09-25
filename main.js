@@ -9,6 +9,10 @@ let strategy = null;
 
 let logNetwork = true;
 
+let moveProvider = null;
+
+let board = null;
+
 let lastArg = "";
 Enumerable.from(process.argv).skip(2).forEach(x => {
 
@@ -37,6 +41,8 @@ Enumerable.from(process.argv).skip(2).forEach(x => {
 		strategy = x;
 });
 
+
+
 var client = new Socket();
 client.connect(port, host, function() {
 	console.log('Connected');
@@ -62,7 +68,8 @@ client.on('data', function(data) {
 	const parser = new DOMParser();
 	const dom = parser.parseFromString(data, "application/xml");
 
-	console.log(dom.getElementsByTagName('board'));
+	board = dom.getElementsByTagName('board')
+	console.log(board);
 
 
 });
@@ -73,3 +80,13 @@ client.on('close', function() {
 	client.destroy();
 	process.exit(1);
 });
+
+exports.onMoveRequested = (newMoveProvider) => {
+	moveProvider = newMoveProvider
+}
+
+exports.board = board;
+
+export default function() {
+	alert('lul')
+}
