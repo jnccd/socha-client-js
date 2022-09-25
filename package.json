@@ -5,9 +5,9 @@
   "main": "main.js",
   "type": "module",
   "dependencies": {
+    "dom-parser": "^0.1.6",
     "linq": "^4.0.0"
   },
-  "devDependencies": {},
   "scripts": {
     "test": "node main.js"
   },

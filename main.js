@@ -1,5 +1,6 @@
 import { Socket } from 'net';
 import Enumerable from 'linq';
+import DOMParser from 'dom-parser';
 
 let host = "127.0.0.1";
 let port = 13050;
@@ -41,7 +42,7 @@ client.connect(port, host, function() {
 	console.log('Connected');
 
 	if (reservation == null) {
-		client.write(`<protocol><join gameType=\"swc_2022_ostseeschach\" />`);
+		client.write(`<protocol><join gameType=\"swc_2023_penguins\" />`);
 	} else {
 		client.write(`<protocol><joinPrepared reservationCode=\"${reservation}\" />`);
 	}
@@ -53,10 +54,22 @@ client.on('data', function(data) {
 	if (logNetwork)
 		console.log('Received: ' + data);
 		
-	client.destroy();
-	process.exit(1);
+	if (data.includes("</protocol>")) {
+		client.destroy();
+		process.exit(1);
+	}
+
+	const parser = new DOMParser();
+	const dom = parser.parseFromString(data, "application/xml");
+
+	console.log(dom.getElementsByTagName('board'));
+
+
 });
 
 client.on('close', function() {
 	console.log('Connection closed');
+
+	client.destroy();
+	process.exit(1);
 });
