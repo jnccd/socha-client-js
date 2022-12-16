@@ -11,8 +11,10 @@ let logNetwork = true;
 
 let moveProvider = null;
 
+// State
 const boardSize = 8
 let board = [[]];
+let turn = 0
 
 let lastArg = "";
 Enumerable.from(process.argv).skip(2).forEach(x => {
@@ -45,7 +47,6 @@ Enumerable.from(process.argv).skip(2).forEach(x => {
 });
 
 
-
 var client = new Socket();
 client.connect(port, host, function() {
 	console.log('Connected');
@@ -74,14 +75,22 @@ client.on('data', function(data) {
 		process.exit(1);
 	}
 
+
 	const parser = new DOMParser();
 	const dom = parser.parseFromString(responseData, "text/xml");
+
+	let domStates = dom.getElementsByTagName('state')
+	if (domStates.length > 0) {
+		turn = domStates.at(0).getAttribute("turn")
+		//console.log(turn)
+	}
 
 	let domBoard = dom.getElementsByTagName('board')
 	if (domBoard.length > 0) {
 		
+		console.log("board stuff:")
 		let domFields = dom.getElementsByTagName('field').map(function(x){ return x.textContent })
-		console.log(domFields)
+		//console.log(domFields)
 
 		// Fill board with field data
 		board = new Array(boardSize)
@@ -91,8 +100,8 @@ client.on('data', function(data) {
 				board[i][j] = domFields[i*boardSize+j]
 			}
 		}
+		//console.log(board)
 	}
-	console.log(board)
 
 	responseData = ""
 });
