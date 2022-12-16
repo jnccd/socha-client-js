@@ -16,6 +16,7 @@ const boardSize = 8
 let board = [[]];
 let turn = 0
 
+// --- Arguments ---
 let lastArg = "";
 Enumerable.from(process.argv).skip(2).forEach(x => {
 
@@ -46,7 +47,7 @@ Enumerable.from(process.argv).skip(2).forEach(x => {
 	lastArg = x
 });
 
-
+// --- Communication ---
 var client = new Socket();
 client.connect(port, host, function() {
 	console.log('Connected');
@@ -113,6 +114,22 @@ client.on('close', function() {
 	process.exit(1);
 });
 
+// --- Game Logic ---
+// returns all possible moves, requires turn number and 2D array board
+function getPossibleMoves(turn, board) {
+	let re = []
+
+	if (turn < 8) {
+		for (var x = 0; x < boardSize; x++)
+			for (var y = 0; y < boardSize; y++)
+                if (Number.isInteger(board[x][y]) && board[x][y] == 1)
+					re.push([null, board[x][y]])
+	} else {
+
+	}
+}
+
+// --- Export? ---
 export default function(newMoveProvider) {
 	moveProvider = newMoveProvider
 	console.log('lul')
