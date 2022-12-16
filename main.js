@@ -11,7 +11,8 @@ let logNetwork = true;
 
 let moveProvider = null;
 
-let board = null;
+const boardSize = 8
+let board = [[]];
 
 let lastArg = "";
 Enumerable.from(process.argv).skip(2).forEach(x => {
@@ -56,22 +57,42 @@ client.connect(port, host, function() {
 
 });
 
+var responseData = "";
 client.on('data', function(data) {
+	responseData += data
+	if (!responseData.includes("</room>") && !responseData.includes("</protocol>")) {
+		return
+	}
+
 	if (logNetwork)
-		console.log('Received: ' + data);
+		console.log('Received: ' + responseData);
 		
-	if (data.includes("</protocol>")) {
+	if (responseData.includes("</protocol>")) {
 		client.destroy();
 		process.exit(1);
 	}
 
 	const parser = new DOMParser();
-	const dom = parser.parseFromString(data, "application/xml");
+	const dom = parser.parseFromString(responseData, "text/xml");
 
-	board = dom.getElementsByTagName('board')
-	console.log(board);
+	let domBoard = dom.getElementsByTagName('board')
+	if (domBoard.length > 0) {
+		
+		let domFields = dom.getElementsByTagName('field').map(function(x){ return x.textContent })
+		console.log(domFields)
 
+		// Fill board with field data
+		board = new Array(boardSize)
+		for(var i = 0; i < board.length; i++){
+			board[i] = new Array(boardSize)
+			for(var j = 0; j < board.length; j++){
+				board[i][j] = domFields[i*boardSize+j]-1+1
+			}
+		}
+	}
+	console.log(board)
 
+	responseData = ""
 });
 
 client.on('close', function() {
@@ -81,12 +102,7 @@ client.on('close', function() {
 	process.exit(1);
 });
 
-exports.onMoveRequested = (newMoveProvider) => {
+export default function(newMoveProvider) {
 	moveProvider = newMoveProvider
-}
-
-exports.board = board;
-
-export default function() {
-	alert('lul')
+	console.log('lul')
 }
