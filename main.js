@@ -40,6 +40,8 @@ Enumerable.from(process.argv).skip(2).forEach(x => {
 		reservation = x;
 	else if (lastArg == "-s" || lastArg == "--strategy")
 		strategy = x;
+
+	lastArg = x
 });
 
 
@@ -86,7 +88,7 @@ client.on('data', function(data) {
 		for(var i = 0; i < board.length; i++){
 			board[i] = new Array(boardSize)
 			for(var j = 0; j < board.length; j++){
-				board[i][j] = domFields[i*boardSize+j]-1+1
+				board[i][j] = domFields[i*boardSize+j]
 			}
 		}
 	}
