@@ -15,6 +15,7 @@ let moveProvider = null;
 const boardSize = 8
 let board = [[]];
 let turn = 0
+let roomId = ""
 
 // --- Arguments ---
 let lastArg = "";
@@ -80,10 +81,42 @@ client.on('data', function(data) {
 	const parser = new DOMParser();
 	const dom = parser.parseFromString(responseData, "text/xml");
 
+	// Move Request handling
+	let domData = dom.getElementsByTagName('data')
+	if (domData.length > 0) {
+		if (domData.at(0).getAttribute("class") == "moveRequest") {
+			let move = getPossibleMoves(turn, board)[0]
+			console.log(move)
+			if (move[0] == null) {
+				let hexTo = move[1].arrayToHexCoords()
+				console.log(hexTo)
+				client.write(`<room roomId="${roomId}">` +
+								`<data class="move\">` +
+									`<to x = "${hexTo.x}\" y="${hexTo.y}"/>\n` +
+								`</data>` +
+							`</room>`)
+			} else {
+				let hexFrom = move[0].arrayToHexCoords()
+				let hexTo = move[1].arrayToHexCoords()
+				client.write(`<room roomId="${roomId}">` +
+								`<data class="move\">` +
+									`<from x="${hexFrom.x}" y="${hexFrom.y}"/>` +
+									`<to x = "${hexTo.x}\" y="${hexTo.y}"/>\n` +
+								`</data>` +
+							`</room>`)
+			}
+		}
+	}
+
+	// --- Parse the rest of xml input ---
 	let domStates = dom.getElementsByTagName('state')
 	if (domStates.length > 0) {
 		turn = domStates.at(0).getAttribute("turn")
-		//console.log(turn)
+	}
+
+	let domJoins = dom.getElementsByTagName('joined')
+	if (domJoins.length > 0) {
+		roomId = domJoins.at(0).getAttribute("roomId")
 	}
 
 	let domBoard = dom.getElementsByTagName('board')
@@ -98,7 +131,7 @@ client.on('data', function(data) {
 		for(var i = 0; i < board.length; i++){
 			board[i] = new Array(boardSize)
 			for(var j = 0; j < board.length; j++){
-				board[i][j] = domFields[i*boardSize+j]
+				board[i][j] = domFields[j*boardSize+i]
 			}
 		}
 		//console.log(board)
@@ -115,17 +148,64 @@ client.on('close', function() {
 });
 
 // --- Game Logic ---
+class Point {
+    constructor(x,y) {
+        this.x = x;
+        this.y = y;
+	}
+
+	add(p) {
+		this.x = p.x + this.x
+		this.y = p.y + this.y
+	}
+	plus(p) {
+		return new Point(p.x + this.x, p.y + this.y)
+	}
+
+	arrayToHexCoords() {
+		return new Point(this.x * 2 + (this.Y % 2 == 1 ? 1 : 0), this.y)
+	}
+	hexToArrayCoords() {
+		return new Point(this.x / 2 - (this.Y % 2 == 1 ? 1 : 0), this.y)
+	}
+}
+
 // returns all possible moves, requires turn number and 2D array board
 function getPossibleMoves(turn, board) {
 	let re = []
+	let currentPlayer = turn % 2 == 0 ? "ONE" : "TWO"
+	let otherPlayer = turn % 2 == 1 ? "ONE" : "TWO"
 
+	console.log(turn)
 	if (turn < 8) {
+		console.log(board)
+		for (var x = 0; x < boardSize; x++)
+			for (var y = 0; y < boardSize; y++) {
+				if (Number.isInteger(board[x][y]-0) && board[x][y] == 1){
+					re.push([null, new Point(x, y)])
+				}
+			}
+	} else {
 		for (var x = 0; x < boardSize; x++)
 			for (var y = 0; y < boardSize; y++)
-                if (Number.isInteger(board[x][y]) && board[x][y] == 1)
-					re.push([null, board[x][y]])
-	} else {
+				if (board[x][y] == currentPlayer) {
 
+					for (var x = 0; x < 6; x++) {
+						let curPos = new Point(x, y)
+
+					}
+
+				}
+	}
+
+	return re
+}
+
+function getDirectionDisplacement(dir, pos) {
+	if (pos.y % 2 == 0) {
+		return [ new(-1), new(0, -1), new(1, 0), new(0, 1), new(-1, 1), new(-1, 0) ][dir]
+	} else {
+		return [ new(0, -1), new(1, -1), new(1, 0), new(1), new(0, 1), new(-1, 0) ][dir]
 	}
 }
 
