@@ -85,7 +85,8 @@ client.on('data', function(data) {
 	let domData = dom.getElementsByTagName('data')
 	if (domData.length > 0) {
 		if (domData.at(0).getAttribute("class") == "moveRequest") {
-			let move = getPossibleMoves(turn, board)[0]
+			let moves = getPossibleMoves(turn, board)
+			let move = moves[Math.floor(Math.random() * moves.length)]
 			console.log(move)
 			if (move[0] == null) {
 				let hexTo = move[1].arrayToHexCoords()
@@ -187,20 +188,24 @@ function getPossibleMoves(turn, board) {
 			for (var y = 0; y < boardSize; y++)
 				if (board[x][y] == currentPlayer) {
 
+					console.log(`From: ${x}, ${y}`)
 					for (var dir = 0; dir < 6; dir++) {
 						let curPos = new Point(x, y)
 						curPos.addInP(getDirectionDisplacement(dir, curPos))
-						console.log(curPos)
-						while (curPos.x > 0 && curPos.y > 0 && curPos.x < 8 && curPos.y < 8 && Number.isInteger(board[curPos.x][curPos.y]-0) && board[curPos.x][curPos.y] != 0){
+						if (curPos.x >= 0 && curPos.y >= 0 && curPos.x < 8 && curPos.y < 8)
+							console.log(`choice: ${curPos.x}|${curPos.y}, ${board[curPos.x][curPos.y]}`)
+						while (curPos.x >= 0 && curPos.y >= 0 && curPos.x < 8 && curPos.y < 8 && Number.isInteger(board[curPos.x][curPos.y]-0) && board[curPos.x][curPos.y] != 0){
 							re.push([new Point(x, y), new Point(curPos.x, curPos.y)])
-							curPos.addInP(getDirectionDisplacement(dir, curPos))
 							console.log(curPos)
+							curPos.addInP(getDirectionDisplacement(dir, curPos))
 						}
 					}
 
 				}
 	}
 
+	console.log("Return moves:")
+	console.log(re)
 	return re
 }
 
