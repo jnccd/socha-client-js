@@ -163,10 +163,10 @@ class Point {
 	}
 
 	arrayToHexCoords() {
-		return new Point(this.x * 2 + (this.Y % 2 == 1 ? 1 : 0), this.y)
+		return new Point(this.x * 2 + (this.y % 2 == 1 ? 1 : 0), this.y)
 	}
 	hexToArrayCoords() {
-		return new Point(this.x / 2 - (this.Y % 2 == 1 ? 1 : 0), this.y)
+		return new Point(this.x / 2 - (this.y % 2 == 1 ? 1 : 0), this.y)
 	}
 }
 
