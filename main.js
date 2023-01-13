@@ -122,9 +122,7 @@ client.on('data', function(data) {
 	let domBoard = dom.getElementsByTagName('board')
 	if (domBoard.length > 0) {
 		
-		console.log("board stuff:")
 		let domFields = dom.getElementsByTagName('field').map(function(x){ return x.textContent })
-		//console.log(domFields)
 
 		// Fill board with field data
 		board = new Array(boardSize)
@@ -134,7 +132,6 @@ client.on('data', function(data) {
 				board[i][j] = domFields[j*boardSize+i]
 			}
 		}
-		//console.log(board)
 	}
 
 	responseData = ""
@@ -154,11 +151,11 @@ class Point {
         this.y = y;
 	}
 
-	add(p) {
+	addInP(p) {
 		this.x = p.x + this.x
 		this.y = p.y + this.y
 	}
-	plus(p) {
+	add(p) {
 		return new Point(p.x + this.x, p.y + this.y)
 	}
 
@@ -190,9 +187,15 @@ function getPossibleMoves(turn, board) {
 			for (var y = 0; y < boardSize; y++)
 				if (board[x][y] == currentPlayer) {
 
-					for (var x = 0; x < 6; x++) {
+					for (var dir = 0; dir < 6; dir++) {
 						let curPos = new Point(x, y)
-
+						curPos.addInP(getDirectionDisplacement(dir, curPos))
+						console.log(curPos)
+						while (curPos.x > 0 && curPos.y > 0 && curPos.x < 8 && curPos.y < 8 && Number.isInteger(board[curPos.x][curPos.y]-0) && board[curPos.x][curPos.y] != 0){
+							re.push([new Point(x, y), new Point(curPos.x, curPos.y)])
+							curPos.addInP(getDirectionDisplacement(dir, curPos))
+							console.log(curPos)
+						}
 					}
 
 				}
@@ -203,9 +206,9 @@ function getPossibleMoves(turn, board) {
 
 function getDirectionDisplacement(dir, pos) {
 	if (pos.y % 2 == 0) {
-		return [ new(-1), new(0, -1), new(1, 0), new(0, 1), new(-1, 1), new(-1, 0) ][dir]
+		return [ new Point(-1, -1), new Point(0, -1), new Point(1, 0), new Point(0, 1), new Point(-1, 1), new Point(-1, 0) ][dir]
 	} else {
-		return [ new(0, -1), new(1, -1), new(1, 0), new(1), new(0, 1), new(-1, 0) ][dir]
+		return [ new Point(0, -1), new Point(1, -1), new Point(1, 0), new Point(1, 1), new Point(0, 1), new Point(-1, 0) ][dir]
 	}
 }
 
