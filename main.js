@@ -1,6 +1,7 @@
 import { Socket } from 'net';
 import Enumerable from 'linq';
 import DOMParser from 'dom-parser';
+import { decideMove } from './logic.js'
 
 let host = "127.0.0.1";
 let port = 13050;
@@ -59,7 +60,6 @@ client.connect(port, host, function() {
 		client.write(`<protocol><joinPrepared reservationCode=\"${reservation}\" />`);
 	}
 	
-
 });
 
 var responseData = "";
@@ -85,8 +85,8 @@ client.on('data', function(data) {
 	let domData = dom.getElementsByTagName('data')
 	if (domData.length > 0) {
 		if (domData.at(0).getAttribute("class") == "moveRequest") {
-			let moves = getPossibleMoves(turn, board)
-			let move = moves[Math.floor(Math.random() * moves.length)]
+
+			let move = decideMove(board, turn, turn % 2 == 0 ? "ONE" : "TWO")
 			console.log(move)
 			if (move[0] == null) {
 				let hexTo = move[1].arrayToHexCoords()
@@ -169,7 +169,7 @@ class Point {
 }
 
 // returns all possible moves, requires turn number and 2D array board
-function getPossibleMoves(turn, board) {
+export function getPossibleMoves(turn, board) {
 	let re = []
 	let currentPlayer = turn % 2 == 0 ? "ONE" : "TWO"
 	let otherPlayer = turn % 2 == 1 ? "ONE" : "TWO"
@@ -215,10 +215,4 @@ function getDirectionDisplacement(dir, pos) {
 	} else {
 		return [ new Point(0, -1), new Point(1, -1), new Point(1, 0), new Point(1, 1), new Point(0, 1), new Point(-1, 0) ][dir]
 	}
-}
-
-// --- Export? ---
-export default function(newMoveProvider) {
-	moveProvider = newMoveProvider
-	console.log('lul')
 }
