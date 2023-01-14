@@ -87,10 +87,12 @@ client.on('data', function(data) {
 		if (domData.at(0).getAttribute("class") == "moveRequest") {
 
 			let move = decideMove(board, turn, turn % 2 == 0 ? "ONE" : "TWO")
+
+			console.log("Chose move: ")
 			console.log(move)
+			console.log("Converting move coordinates to hex coordinates...")
 			if (move[0] == null) {
 				let hexTo = move[1].arrayToHexCoords()
-				console.log(hexTo)
 				client.write(`<room roomId="${roomId}">` +
 								`<data class="move\">` +
 									`<to x = "${hexTo.x}\" y="${hexTo.y}"/>\n` +
@@ -146,7 +148,7 @@ client.on('close', function() {
 });
 
 // --- Game Logic ---
-class Point {
+export class Point {
     constructor(x,y) {
         this.x = x;
         this.y = y;
@@ -188,15 +190,11 @@ export function getPossibleMoves(turn, board) {
 			for (var y = 0; y < boardSize; y++)
 				if (board[x][y] == currentPlayer) {
 
-					console.log(`From: ${x}, ${y}`)
 					for (var dir = 0; dir < 6; dir++) {
 						let curPos = new Point(x, y)
 						curPos.addInP(getDirectionDisplacement(dir, curPos))
-						if (curPos.x >= 0 && curPos.y >= 0 && curPos.x < 8 && curPos.y < 8)
-							console.log(`choice: ${curPos.x}|${curPos.y}, ${board[curPos.x][curPos.y]}`)
 						while (curPos.x >= 0 && curPos.y >= 0 && curPos.x < 8 && curPos.y < 8 && Number.isInteger(board[curPos.x][curPos.y]-0) && board[curPos.x][curPos.y] != 0){
 							re.push([new Point(x, y), new Point(curPos.x, curPos.y)])
-							console.log(curPos)
 							curPos.addInP(getDirectionDisplacement(dir, curPos))
 						}
 					}
@@ -204,8 +202,6 @@ export function getPossibleMoves(turn, board) {
 				}
 	}
 
-	console.log("Return moves:")
-	console.log(re)
 	return re
 }
 
