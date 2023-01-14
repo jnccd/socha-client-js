@@ -1,4 +1,4 @@
-import { getPossibleMoves } from './main.js'
+import { Point, getPossibleMoves } from './main.js'
 
 export function decideMove(board, turn, currentPlayer) {
     let moves = getPossibleMoves(turn, board)
