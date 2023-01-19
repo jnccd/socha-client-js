@@ -15,7 +15,11 @@ Both approaches require you to have the [Node.js Version 18](https://nodejs.org/
 
 Once everything is prepared you can add your code to the `logic.js` file using any IDE you like, however I would recommend Visual Studio Code.
 
-To run this project write the following in the console:
+To setup this project execute the following in the console:
+
+```npm install```
+
+To run it write this:
 
 ```node main.js```
 
